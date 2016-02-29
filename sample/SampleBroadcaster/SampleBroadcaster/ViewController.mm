@@ -93,15 +93,15 @@
         case VCFilterInvertColors:
             [_session setFilter:VCFilterSepia];
             break;
-        case VCFilterSepia:
-            [_session setFilter:VCFilterFisheye];
-            break;
-        case VCFilterFisheye:
-            [_session setFilter:VCFilterGlow];
-            break;
-        case VCFilterGlow:
-            [_session setFilter:VCFilterNormal];
-            break;
+//        case VCFilterSepia:
+//            [_session setFilter:VCFilterFisheye];
+//            break;
+//        case VCFilterFisheye:
+//            [_session setFilter:VCFilterGlow];
+//            break;
+//        case VCFilterGlow:
+//            [_session setFilter:VCFilterNormal];
+//            break;
         default:
             break;
     }
