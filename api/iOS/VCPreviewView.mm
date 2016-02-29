@@ -164,7 +164,6 @@
 
 - (void) drawFrame:(CVPixelBufferRef)pixelBuffer
 {
-    
     if(_paused) return;
     
     bool updateTexture = false;
@@ -239,7 +238,7 @@
         float wfac = float(bSelf.bounds.size.width) / width;
         float hfac = float(bSelf.bounds.size.height) / height;
         
-        bool aspectFit = false;
+        bool aspectFit = true;
         
         const float mult = (aspectFit ? (wfac < hfac) : (wfac > hfac)) ? wfac : hfac;
         

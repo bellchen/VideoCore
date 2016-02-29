@@ -73,6 +73,13 @@ namespace videocore {
         m_height = height;
         m_positionIsDirty = true;
     }
+    void
+    PositionTransform::setContextSize(int width, int height)
+    {
+        m_contextWidth = width;
+        m_contextHeight = height;
+        m_positionIsDirty = true;
+    }
     
     void
     PositionTransform::pushBuffer(const uint8_t *const data,
@@ -82,7 +89,6 @@ namespace videocore {
         auto output = m_output.lock();
         
         if(output) {
-
             if(m_positionIsDirty) {
                 glm::mat4 mat(1.f);
                 const float x (m_posX), y(m_posY), cw(m_contextWidth), ch(m_contextHeight), w(m_width), h(m_height);

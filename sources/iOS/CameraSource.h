@@ -51,13 +51,13 @@ namespace videocore { namespace iOS {
         /*! ISource::setOutput */
         void setOutput(std::shared_ptr<IOutput> output);
         
-        /*! 
+        /*!
          *  Get the AVCaptureVideoPreviewLayer associated with the camera output.
          *
          *  \param outAVCaputreVideoPreviewLayer a pointer to an AVCaptureVideoPreviewLayer pointer.
          */
         void getPreviewLayer(void** outAVCaptureVideoPreviewLayer);
-
+        
         /*!
          *  Setup camera properties
          *
@@ -68,13 +68,13 @@ namespace videocore { namespace iOS {
          *  \param callbackBlock block to be called after everything is set
          */
         void setupCamera(int fps = 15, bool useFront = true, bool useInterfaceOrientation = false, NSString* sessionPreset = nil, void (^callbackBlock)(void) = nil);
-
+        
         
         /*!
          *  Toggle the camera between front and back-facing cameras.
          */
         void toggleCamera();
-
+        
         /*!
          * If the orientation is locked, we ignore device / interface
          * orientation changes.
@@ -95,7 +95,7 @@ namespace videocore { namespace iOS {
          *  Attempt to turn the torch mode on or off.
          *
          *  \param torchOn  Bool indicating whether the torch should be on or off.
-         *  
+         *
          *  \return the actual state of the torch.
          */
         bool setTorch(bool torchOn);
@@ -124,11 +124,11 @@ namespace videocore { namespace iOS {
         
     private:
         
-        /*! 
+        /*!
          * Get a camera with a specified position
          *
          * \param position The position to search for.
-         * 
+         *
          * \return the camera device, if found.
          */
         void* cameraWithPosition(int position);
@@ -149,7 +149,7 @@ namespace videocore { namespace iOS {
         bool m_torchOn;
         bool m_useInterfaceOrientation;
         bool m_orientationLocked;
-
+        
     };
     
 }

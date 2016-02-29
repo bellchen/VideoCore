@@ -32,6 +32,7 @@
 #include <videocore/transforms/Split.h>
 #include <videocore/transforms/AspectTransform.h>
 #include <videocore/transforms/PositionTransform.h>
+#include <videocore/filters/Basic/BeautyVideoFilter.h>
 
 #ifdef __APPLE__
 #   include <videocore/mixers/Apple/AudioMixer.h>
@@ -56,7 +57,7 @@
 
 
 #include <sstream>
-
+#include <chrono>
 
 static const int kMinVideoBitrate = 32000;
 
@@ -113,7 +114,7 @@ namespace videocore { namespace simpleApi {
     std::shared_ptr<videocore::Apple::MP4Multiplexer> m_muxer;
 
     std::shared_ptr<videocore::IOutputSession> m_outputSession;
-
+    std::chrono::steady_clock::time_point _epoch;
 
     // properties
 
@@ -191,6 +192,60 @@ namespace videocore { namespace simpleApi {
     if(m_positionTransform) {
         m_positionTransform->setSize(videoSize.width * self.videoZoomFactor,
                                      videoSize.height * self.videoZoomFactor);
+        m_positionTransform->setContextSize(videoSize.width, videoSize.height);
+        m_positionTransform->setPosition(videoSize.width/2, videoSize.height/2);
+    }
+    
+    if (m_videoMixer) {
+        m_videoMixer.reset();
+
+        m_videoMixer = std::make_shared<videocore::iOS::GLESVideoMixer>(self.videoSize.width,
+                                                                        self.videoSize.height,
+                                                                        1.0f/self.fps);
+        [self setFilter:_filter];
+        
+        m_videoMixer->setOutput(m_videoSplit);
+        m_positionTransform->setOutput(m_videoMixer);
+        m_videoMixer->setEpoch(_epoch);
+        m_videoMixer->start();
+        
+        
+        videocore::filters::BeautyVideoFilter * filter = (videocore::filters::BeautyVideoFilter*)m_videoMixer->filterFactory().filter("com.videocore.filters.beauty");
+        filter->setOutputSize(self.videoSize.width, self.videoSize.height);
+    }
+    
+    if (m_h264Encoder) {
+        m_h264Encoder.reset();
+        if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
+            int ctsOffset = 2000 / self.fps;
+            // If >= iOS 8.0 use the VideoToolbox encoder that does not write to disk.
+            m_h264Encoder = std::make_shared<videocore::Apple::H264Encode>(self.videoSize.width,
+                                                                           self.videoSize.height,
+                                                                           self.fps,
+                                                                           self.bitrate,
+                                                                           false,
+                                                                           ctsOffset);
+        } else {
+            m_h264Encoder =std::make_shared<videocore::iOS::H264Encode>(self.videoSize.width,
+                                                                        self.videoSize.height,
+                                                                        self.fps,
+                                                                        self.bitrate);
+        }
+        m_h264Encoder->setOutput(m_h264Split);
+        m_videoSplit->setOutput(m_h264Encoder);
+        
+    }
+    
+    if (m_outputSession) {
+        videocore::RTMPSessionParameters_t sp ( 0. );
+        sp.setData(self.videoSize.width,
+                   self.videoSize.height,
+                   1. / static_cast<double>(self.fps),
+                   self.bitrate,
+                   self.audioSampleRate,
+                   (self.audioChannelCount == 2));
+        
+        m_outputSession->setSessionParameters(sp);
     }
 }
 - (int) bitrate
@@ -258,6 +313,12 @@ namespace videocore { namespace simpleApi {
         _cameraState = cameraState;
         if(m_cameraSource) {
             m_cameraSource->toggleCamera();
+        }
+        if (self.cameraState == VCCameraStateFront) {
+            m_aspectTransform->setHReverse(true);
+        }
+        else {
+            m_aspectTransform->setHReverse(false);
         }
     }
 }
@@ -689,6 +750,9 @@ namespace videocore { namespace simpleApi {
             case VCFilterGlow:
                 filterName = @"com.videocore.filters.glow";
                 break;
+            case VCFilterBeauty:
+                filterName = @"com.videocore.filters.beauty";
+                break;
             default:
                 break;
         }
@@ -764,6 +828,9 @@ namespace videocore { namespace simpleApi {
         m_cameraSource = std::make_shared<videocore::iOS::CameraSource>();
         m_cameraSource->setOrientationLocked(self.orientationLocked);
         auto aspectTransform = std::make_shared<videocore::AspectTransform>(self.videoSize.width,self.videoSize.height,m_aspectMode);
+        if (self.cameraState == VCCameraStateFront) {
+            aspectTransform->setHReverse(true);
+        }
 
         auto positionTransform = std::make_shared<videocore::PositionTransform>(self.videoSize.width/2, self.videoSize.height/2,
                                                                                 self.videoSize.width * self.videoZoomFactor, self.videoSize.height * self.videoZoomFactor,
@@ -779,6 +846,10 @@ namespace videocore { namespace simpleApi {
 
             m_videoMixer->setSourceFilter(m_cameraSource, dynamic_cast<videocore::IVideoFilter*>(m_videoMixer->filterFactory().filter("com.videocore.filters.bgra")));
             _filter = VCFilterNormal;
+            
+            videocore::filters::BeautyVideoFilter * filter = (videocore::filters::BeautyVideoFilter*)m_videoMixer->filterFactory().filter("com.videocore.filters.beauty");
+            filter->setOutputSize(self.videoSize.width, self.videoSize.height);
+            
             aspectTransform->setOutput(positionTransform);
             positionTransform->setOutput(m_videoMixer);
             m_aspectTransform = aspectTransform;
@@ -795,10 +866,10 @@ namespace videocore { namespace simpleApi {
         m_micSource = std::make_shared<videocore::iOS::MicSource>(self.audioSampleRate, self.audioChannelCount);
         m_micSource->setOutput(m_audioMixer);
 
-        const auto epoch = std::chrono::steady_clock::now();
+        _epoch = std::chrono::steady_clock::now();
 
-        m_audioMixer->setEpoch(epoch);
-        m_videoMixer->setEpoch(epoch);
+        m_audioMixer->setEpoch(_epoch);
+        m_videoMixer->setEpoch(_epoch);
 
         m_audioMixer->start();
         m_videoMixer->start();

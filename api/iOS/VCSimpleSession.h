@@ -66,7 +66,8 @@ typedef NS_ENUM(NSInteger, VCFilter) {
     VCFilterInvertColors,
     VCFilterSepia,
     VCFilterFisheye,
-    VCFilterGlow
+    VCFilterGlow,
+    VCFilterBeauty
 };
 
 @protocol VCSessionDelegate <NSObject>
@@ -79,7 +80,9 @@ typedef NS_ENUM(NSInteger, VCFilter) {
 - (void) detectedThroughput: (NSInteger) throughputInBytesPerSecond videoRate:(NSInteger) rate;
 @end
 
-@interface VCSimpleSession : NSObject
+@interface VCSimpleSession : NSObject {
+    
+}
 
 @property (nonatomic, readonly) VCSessionState rtmpSessionState;
 @property (nonatomic, strong, readonly) UIView* previewView;

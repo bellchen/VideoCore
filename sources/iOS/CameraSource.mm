@@ -72,7 +72,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 @end
 namespace videocore { namespace iOS {
     
-
+    
     
     CameraSource::CameraSource()
     :
@@ -207,7 +207,7 @@ namespace videocore { namespace iOS {
             
         }
     }
-
+    
     void
     CameraSource::getPreviewLayer(void** outAVCaptureVideoPreviewLayer)
     {
@@ -273,7 +273,7 @@ namespace videocore { namespace iOS {
             } else {
                 NSLog(@"Torch not available in current camera input");
             }
-
+            
         }
         
         [session commitConfiguration];
@@ -348,28 +348,28 @@ namespace videocore { namespace iOS {
                     case UIInterfaceOrientationPortraitUpsideDown:
                         if(av.videoOrientation != AVCaptureVideoOrientationPortraitUpsideDown) {
                             av.videoOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
-                        //    reorient = true;
+                            //    reorient = true;
                         }
                         break;
                         // UIInterfaceOrientationLandscapeRight, UIDeviceOrientationLandscapeLeft
                     case UIInterfaceOrientationLandscapeRight:
                         if(av.videoOrientation != AVCaptureVideoOrientationLandscapeRight) {
                             av.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
-                        //    reorient = true;
+                            //    reorient = true;
                         }
                         break;
                         // UIInterfaceOrientationLandscapeLeft, UIDeviceOrientationLandscapeRight
                     case UIInterfaceOrientationLandscapeLeft:
                         if(av.videoOrientation != AVCaptureVideoOrientationLandscapeLeft) {
                             av.videoOrientation = AVCaptureVideoOrientationLandscapeLeft;
-                         //   reorient = true;
+                            //   reorient = true;
                         }
                         break;
                         // UIInterfaceOrientationPortrait, UIDeviceOrientationPortrait
                     case UIInterfaceOrientationPortrait:
                         if(av.videoOrientation != AVCaptureVideoOrientationPortrait) {
                             av.videoOrientation = AVCaptureVideoOrientationPortrait;
-                        //    reorient = true;
+                            //    reorient = true;
                         }
                         break;
                     default:
@@ -377,7 +377,7 @@ namespace videocore { namespace iOS {
                 }
             }
         }
-
+        
         //[session commitConfiguration];
         if(m_torchOn) {
             setTorch(m_torchOn);
@@ -415,7 +415,7 @@ namespace videocore { namespace iOS {
         AVCaptureDevice* device = (AVCaptureDevice*)m_captureDevice;
         AVCaptureFocusMode newMode = wantsContinuous ?  AVCaptureFocusModeContinuousAutoFocus : AVCaptureFocusModeAutoFocus;
         bool ret = [device isFocusModeSupported:newMode];
-
+        
         if(ret) {
             NSError *err = nil;
             if ([device lockForConfiguration:&err]) {
@@ -428,16 +428,16 @@ namespace videocore { namespace iOS {
         } else {
             NSLog(@"Focus mode not supported: %@", wantsContinuous ? @"AVCaptureFocusModeContinuousAutoFocus" : @"AVCaptureFocusModeAutoFocus");
         }
-
+        
         return ret;
     }
-
+    
     bool
     CameraSource::setContinuousExposure(bool wantsContinuous) {
         AVCaptureDevice *device = (AVCaptureDevice *) m_captureDevice;
         AVCaptureExposureMode newMode = wantsContinuous ? AVCaptureExposureModeContinuousAutoExposure : AVCaptureExposureModeAutoExpose;
         bool ret = [device isExposureModeSupported:newMode];
-
+        
         if(ret) {
             NSError *err = nil;
             if ([device lockForConfiguration:&err]) {
@@ -450,7 +450,7 @@ namespace videocore { namespace iOS {
         } else {
             NSLog(@"Exposure mode not supported: %@", wantsContinuous ? @"AVCaptureExposureModeContinuousAutoExposure" : @"AVCaptureExposureModeAutoExpose");
         }
-
+        
         return ret;
     }
     
