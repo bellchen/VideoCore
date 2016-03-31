@@ -69,7 +69,11 @@ typedef NS_ENUM(NSInteger, VCFilter) {
     VCFilterGlow,
     VCFilterBeauty
 };
-
+typedef NS_ENUM(NSInteger, VCDisconnectReason) {
+    VCDisconnectReasonManual,
+    VCDisconnectReasonDealloc,
+    VCDisconnectReasonConnectError
+};
 @protocol VCSessionDelegate <NSObject>
 @required
 - (void) connectionStatusChanged: (VCSessionState) sessionState;
@@ -78,6 +82,7 @@ typedef NS_ENUM(NSInteger, VCFilter) {
 
 - (void) detectedThroughput: (NSInteger) throughputInBytesPerSecond; //Depreciated, should use method below
 - (void) detectedThroughput: (NSInteger) throughputInBytesPerSecond videoRate:(NSInteger) rate;
+- (void) didDisconnectWithReason:(VCDisconnectReason)reason;
 @end
 
 @interface VCSimpleSession : NSObject {
@@ -142,7 +147,8 @@ typedef NS_ENUM(NSInteger, VCFilter) {
 - (void) startRtmpSessionWithURL:(NSString*) rtmpUrl
                     andStreamKey:(NSString*) streamKey;
 
-- (void) endRtmpSession;
+//- (void) endRtmpSession;
+- (void) manualEndRtmpSession;
 
 - (void) getCameraPreviewLayer: (AVCaptureVideoPreviewLayer**) previewLayer;
 

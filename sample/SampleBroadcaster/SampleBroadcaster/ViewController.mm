@@ -75,7 +75,7 @@
             [_session startRtmpSessionWithURL:@"rtmp://192.168.50.19/myapp" andStreamKey:@"iosstream?abc=xxx"];
             break;
         default:
-            [_session endRtmpSession];
+            [_session manualEndRtmpSession];
             break;
     }
 }

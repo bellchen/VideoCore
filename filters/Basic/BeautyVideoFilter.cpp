@@ -234,8 +234,8 @@ namespace videocore { namespace filters {
                     glBindVertexArrayOES(m_vao);
                 }
 
-                glUniform2f(m_singleStepOffset, 2.0f/m_width, 2.0f/m_height);
-                glUniform4f(m_params, 0.33f, 0.63f, 0.4f, 0.35f);
+                glUniform2f(m_singleStepOffset, 2.0f/(int)m_width, 2.0f/(int)m_height);
+                glUniform4f(m_params, 0.4f, 0.7f, 0.38f, 0.30f);
                 glUniformMatrix4fv(m_uMatrix, 1, GL_FALSE, &m_matrix[0][0]);
                 
                 break;

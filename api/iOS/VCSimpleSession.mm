@@ -326,7 +326,7 @@ namespace videocore { namespace simpleApi {
 {
     _rtmpSessionState = rtmpSessionState;
     if (NSOperationQueue.currentQueue != NSOperationQueue.mainQueue) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{//TODO async-->sync
             // trigger in main thread, avoid autolayout engine exception
             if(self.delegate) {
                 [self.delegate connectionStatusChanged:rtmpSessionState];
@@ -562,6 +562,7 @@ namespace videocore { namespace simpleApi {
 - (void) dealloc
 {
     [self endRtmpSession];
+    [self didDisconnectWithReason:VCDisconnectReasonDealloc];
     m_audioMixer.reset();
     m_videoMixer.reset();
     m_videoSplit.reset();
@@ -620,10 +621,12 @@ namespace videocore { namespace simpleApi {
                                                               case kClientStateError:
                                                                   self.rtmpSessionState = VCSessionStateError;
                                                                   [self endRtmpSession];
+                                                                  [self didDisconnectWithReason:VCDisconnectReasonConnectError];
                                                                   break;
                                                               case kClientStateNotConnected:
                                                                   self.rtmpSessionState = VCSessionStateEnded;
                                                                   [self endRtmpSession];
+                                                                  [self didDisconnectWithReason:VCDisconnectReasonConnectError];
                                                                   break;
                                                               default:
                                                                   break;
@@ -706,6 +709,10 @@ namespace videocore { namespace simpleApi {
 
     m_outputSession->setSessionParameters(sp);
 }
+- (void) manualEndRtmpSession{
+    [self endRtmpSession];
+    [self didDisconnectWithReason:VCDisconnectReasonManual];
+}
 - (void) endRtmpSession
 {
 
@@ -720,6 +727,20 @@ namespace videocore { namespace simpleApi {
     _bitrate = _bpsCeiling;
 
     self.rtmpSessionState = VCSessionStateEnded;
+}
+- (void)didDisconnectWithReason:(VCDisconnectReason)reason{
+    if (NSOperationQueue.currentQueue != NSOperationQueue.mainQueue) {
+        dispatch_sync(dispatch_get_main_queue(), ^{//TODO async-->sync
+            // trigger in main thread, avoid autolayout engine exception
+            if(self.delegate && [self.delegate respondsToSelector:@selector(didDisconnectWithReason:)]) {
+                [self.delegate didDisconnectWithReason:reason];
+            }
+        });
+    } else {
+        if (self.delegate && [self.delegate respondsToSelector:@selector(didDisconnectWithReason:)]) {
+            [self.delegate didDisconnectWithReason:reason];
+        }
+    }
 }
 - (void) getCameraPreviewLayer:(AVCaptureVideoPreviewLayer **)previewLayer {
     if(m_cameraSource) {

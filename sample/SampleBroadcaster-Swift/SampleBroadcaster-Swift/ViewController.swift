@@ -67,7 +67,7 @@ class ViewController: UIViewController, VCSessionDelegate
         case .None, .PreviewStarted, .Ended, .Error:
             session.startRtmpSessionWithURL("rtmp://192.168.1.151/live", andStreamKey: "myStream")
         default:
-            session.endRtmpSession()
+            session.manualEndRtmpSession()
             break
         }
     }
