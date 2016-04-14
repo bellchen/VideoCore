@@ -59,7 +59,7 @@
 #include <sstream>
 #include <chrono>
 
-static const int kMinVideoBitrate = 32000;
+static const int kMinVideoBitrate = 384000;
 
 namespace videocore { namespace simpleApi {
 
@@ -542,6 +542,7 @@ namespace videocore { namespace simpleApi {
     self.audioSampleRate = 44100.;
     self.useAdaptiveBitrate = NO;
     self.aspectMode = aspectMode;
+    self.audioBitrate = 80000;
 
     _previewView = [[VCPreviewView alloc] init];
     self.videoZoomFactor = 1.f;
@@ -666,30 +667,31 @@ namespace videocore { namespace simpleApi {
 
                                                       videoBr = video->bitrate();
 
-                                                      if (audio) {
+//                                                      if (audio) {
+//
+//                                                          if ( videoBr > 500000 ) {
+//                                                              audio->setBitrate(128000);
+//                                                          } else if (videoBr <= 500000 && videoBr > 250000) {
+//                                                              audio->setBitrate(96000);
+//                                                          } else {
+//                                                              audio->setBitrate(80000);
+//                                                          }
+//                                                      }
 
-                                                          if ( videoBr > 500000 ) {
-                                                              audio->setBitrate(128000);
-                                                          } else if (videoBr <= 500000 && videoBr > 250000) {
-                                                              audio->setBitrate(96000);
-                                                          } else {
-                                                              audio->setBitrate(80000);
-                                                          }
-                                                      }
 
-
-                                                      if(videoBr > 1152000) {
-                                                          video->setBitrate(std::min(int((videoBr / 384000 + vector )) * 384000, bSelf->_bpsCeiling) );
-                                                      }
-                                                      else if( videoBr > 512000 ) {
-                                                          video->setBitrate(std::min(int((videoBr / 128000 + vector )) * 128000, bSelf->_bpsCeiling) );
-                                                      }
-                                                      else if( videoBr > 128000 ) {
-                                                          video->setBitrate(std::min(int((videoBr / 64000 + vector )) * 64000, bSelf->_bpsCeiling) );
-                                                      }
-                                                      else {
-                                                          video->setBitrate(std::max(std::min(int((videoBr / 32000 + vector )) * 32000, bSelf->_bpsCeiling), kMinVideoBitrate) );
-                                                      }
+//                                                      if(videoBr > 1152000) {
+//                                                          video->setBitrate(std::min(int((videoBr / 384000 + vector )) * 384000, bSelf->_bpsCeiling) );
+//                                                      }
+//                                                      else if( videoBr > 512000 ) {
+//                                                          video->setBitrate(std::min(int((videoBr / 128000 + vector )) * 128000, bSelf->_bpsCeiling) );
+//                                                      }
+//                                                      else if( videoBr > 128000 ) {
+//                                                          video->setBitrate(std::min(int((videoBr / 64000 + vector )) * 64000, bSelf->_bpsCeiling) );
+//                                                      }
+//                                                      else {
+//                                                          video->setBitrate(std::max(std::min(int((videoBr / 32000 + vector )) * 32000, bSelf->_bpsCeiling), kMinVideoBitrate) );
+//                                                      }
+                                                      video->setBitrate(std::max(std::min(int((videoBr / 128000 + vector )) * 128000, bSelf->_bpsCeiling), kMinVideoBitrate));
                                                       DLog("\n(%f) AudioBR: %d VideoBR: %d (%f)\n", vector, audio->bitrate(), video->bitrate(), predicted);
                                                   } /* if(vector != 0) */
 
@@ -903,7 +905,7 @@ namespace videocore { namespace simpleApi {
     {
         // Add encoders
 
-        m_aacEncoder = std::make_shared<videocore::iOS::AACEncode>(self.audioSampleRate, self.audioChannelCount, 96000);
+        m_aacEncoder = std::make_shared<videocore::iOS::AACEncode>(self.audioSampleRate, self.audioChannelCount, self.audioBitrate);
         if(SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")) {
             // If >= iOS 8.0 use the VideoToolbox encoder that does not write to disk.
             m_h264Encoder = std::make_shared<videocore::Apple::H264Encode>(self.videoSize.width,

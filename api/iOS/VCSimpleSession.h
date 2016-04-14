@@ -96,6 +96,7 @@ typedef NS_ENUM(NSInteger, VCDisconnectReason) {
 @property (nonatomic, assign) CGSize            videoSize;      // Change will not take place until the next RTMP Session
 @property (nonatomic, assign) int               bitrate;        // Change will not take place until the next RTMP Session
 @property (nonatomic, assign) int               fps;            // Change will not take place until the next RTMP Session
+@property (nonatomic, assign) int               audioBitrate;
 @property (nonatomic, assign, readonly) BOOL    useInterfaceOrientation;
 @property (nonatomic, assign) VCCameraState cameraState;
 @property (nonatomic, assign) BOOL          orientationLocked;
