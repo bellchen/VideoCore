@@ -110,7 +110,7 @@
         [bSelf setupGLES];
     });
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notification:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notification:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(notification:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 - (void) dealloc
 {
@@ -156,7 +156,7 @@
 - (void) notification: (NSNotification*) notification {
     if([notification.name isEqualToString:UIApplicationDidEnterBackgroundNotification]) {
         _paused = true;
-    } else if([notification.name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
+    } else if([notification.name isEqualToString:UIApplicationDidBecomeActiveNotification]) {
         _paused = false;
     }
 }
