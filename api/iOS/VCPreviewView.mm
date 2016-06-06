@@ -238,7 +238,7 @@
         float wfac = float(bSelf.bounds.size.width) / width;
         float hfac = float(bSelf.bounds.size.height) / height;
         
-        bool aspectFit = true;
+        bool aspectFit = false;
         
         const float mult = (aspectFit ? (wfac < hfac) : (wfac > hfac)) ? wfac : hfac;
         

@@ -17,7 +17,7 @@ namespace videocore { namespace filters {
     bool
     BasicVideoFilterBGRAinYUVAout::registerFilter()
     {
-        FilterFactory::_register("com.videocore.filters.bgra2yuva", []() { return new BasicVideoFilterBGRAinYUVAout(); });
+        FilterFactory::_register("com.videocore.filters.bgra2yuva", []() { return new BasicVideoFilterBGRAinYUVAout(); });//TODO 尝试在kCVPixelBufferPixelFormatTypeKey = kCVPixelFormatType_420YpCbCr8BiPlanarFullRange 时使用这个filter，看能否正常解析出画面
         return true;
     }
     

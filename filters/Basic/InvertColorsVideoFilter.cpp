@@ -64,7 +64,7 @@ namespace videocore { namespace filters {
                void main(void) {
                    vec4 color = texture2D(uTex0, vCoord);
                    gl_FragColor = vec4(1.0 - color.r, 1.0 - color.g, 1.0 - color.b, color.a);
-               }
+               }//TODO 对比InvertColors 和 BGRA，把这个filter改成不反转颜色，尽量原样输出来模拟不加任何filter的情形
         )
         
         return nullptr;

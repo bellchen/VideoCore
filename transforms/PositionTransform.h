@@ -73,7 +73,6 @@ namespace videocore {
         void setSize(int width,
                      int height);
         
-        void setContextSize(int width, int height);
         
     public:
         

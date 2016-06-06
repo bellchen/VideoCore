@@ -74,14 +74,7 @@ namespace videocore {
         m_positionIsDirty = true;
     }
     void
-    PositionTransform::setContextSize(int width, int height)
-    {
-        m_contextWidth = width;
-        m_contextHeight = height;
-        m_positionIsDirty = true;
-    }
     
-    void
     PositionTransform::pushBuffer(const uint8_t *const data,
                                   size_t size,
                                   videocore::IMetadata &metadata)

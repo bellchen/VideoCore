@@ -50,7 +50,8 @@ typedef NS_ENUM(NSInteger, VCSessionState)
 typedef NS_ENUM(NSInteger, VCCameraState)
 {
     VCCameraStateFront,
-    VCCameraStateBack
+    VCCameraStateBack,
+    VCCameraStateCustom
 };
 
 typedef NS_ENUM(NSInteger, VCAspectMode)
@@ -162,5 +163,7 @@ typedef NS_ENUM(NSInteger, VCDisconnectReason) {
 
 - (void) addPixelBufferSource: (UIImage*) image
                      withRect: (CGRect) rect;
+
+- (void) bufferCaptured:(CVPixelBufferRef)pixelBufferRef;
 
 @end
