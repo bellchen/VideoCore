@@ -38,6 +38,7 @@ namespace videocore {
     m_boundingHeight(boundingHeight),
     m_aspectMode(aspectMode),
     m_boundingBoxDirty(true),
+    m_hReverse(false),
     m_prevWidth(0),
     m_prevHeight(0)
     {
@@ -76,7 +77,13 @@ namespace videocore {
     }
     
     void
+    AspectTransform::setHReverse(bool hReverse)
+    {
+        m_hReverse = hReverse;
+        m_boundingBoxDirty = true;
+    }
     
+    void
     AspectTransform::pushBuffer(const uint8_t *const data,
                                 size_t size,
                                 videocore::IMetadata &metadata)
@@ -108,8 +115,13 @@ namespace videocore {
                 wfac = width*mult / float(m_boundingWidth);
                 hfac = height*mult / float(m_boundingHeight);
                 
+                if (m_hReverse) {
+                    m_scale = glm::vec3(-wfac,hfac,1.f);
+                }
+                else {
                     m_scale = glm::vec3(wfac,hfac,1.f);
-                    
+                }
+                
                 
                 m_boundingBoxDirty = false;
             }

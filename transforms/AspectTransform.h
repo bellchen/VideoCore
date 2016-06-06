@@ -78,7 +78,7 @@ namespace videocore {
          */
         void setBoundingBoxDirty() ;
         
-        
+        void setHReverse(bool hReverse);
     public:
         
         /*! ITransform::setOutput */
@@ -104,6 +104,7 @@ namespace videocore {
         
         bool m_boundingBoxDirty;
         
+        bool m_hReverse;
         
     };
 }

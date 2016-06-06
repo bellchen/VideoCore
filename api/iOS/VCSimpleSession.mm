@@ -260,6 +260,14 @@ namespace videocore { namespace simpleApi {
         if(m_cameraSource) {
             m_cameraSource->toggleCamera();
         }
+        if (!self.customCamera){
+        if (self.cameraState == VCCameraStateFront) {
+            m_aspectTransform->setHReverse(true);
+        }
+        else {
+            m_aspectTransform->setHReverse(false);
+            }
+        }
     }
 }
 - (void) setRtmpSessionState:(VCSessionState)rtmpSessionState
@@ -486,8 +494,10 @@ namespace videocore { namespace simpleApi {
 
     _previewView = [[VCPreviewView alloc] init];
     self.videoZoomFactor = 1.f;
+    self.customPreview = NO;
 
     _cameraState = cameraState;
+    self.customCamera = cameraState == VCCameraStateCustom;
     _exposurePOI = _focusPOI = CGPointMake(0.5f, 0.5f);
     _continuousExposure = _continuousAutofocus = YES;
 
@@ -745,7 +755,9 @@ namespace videocore { namespace simpleApi {
 
         m_pbOutput = std::make_shared<videocore::simpleApi::PixelBufferOutput>([=](const void* const data, size_t size){
             CVPixelBufferRef ref = (CVPixelBufferRef)data;
+            if (!self.customPreview) {
             [preview drawFrame:ref];//TODO 加个属性识别是用户自行处理preview，可以避免drawFrame
+            }
             if(self.rtmpSessionState == VCSessionStateNone) {
                 self.rtmpSessionState = VCSessionStatePreviewStarted;
             }
@@ -767,6 +779,10 @@ namespace videocore { namespace simpleApi {
         m_cameraSource = std::make_shared<videocore::iOS::CameraSource>();
         m_cameraSource->setOrientationLocked(self.orientationLocked);
         auto aspectTransform = std::make_shared<videocore::AspectTransform>(self.videoSize.width,self.videoSize.height,m_aspectMode);
+        if (!self.customCamera &&
+            self.cameraState == VCCameraStateFront) {
+            aspectTransform->setHReverse(YES);
+        }
 
         auto positionTransform = std::make_shared<videocore::PositionTransform>(self.videoSize.width/2, self.videoSize.height/2,
                                                                                 self.videoSize.width * self.videoZoomFactor, self.videoSize.height * self.videoZoomFactor,

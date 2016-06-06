@@ -115,6 +115,8 @@ typedef NS_ENUM(NSInteger, VCDisconnectReason) {
 @property (nonatomic, assign) VCAspectMode  aspectMode;
 
 @property (nonatomic, assign) VCFilter      filter; /* Default is VCFilterNormal*/
+@property (nonatomic, assign) BOOL          customCamera;
+@property (nonatomic, assign) BOOL          customPreview;
 
 @property (nonatomic, assign) id<VCSessionDelegate> delegate;
 
