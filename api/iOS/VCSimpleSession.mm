@@ -261,11 +261,11 @@ namespace videocore { namespace simpleApi {
             m_cameraSource->toggleCamera();
         }
         if (!self.customCamera){
-        if (self.cameraState == VCCameraStateFront) {
-            m_aspectTransform->setHReverse(true);
-        }
-        else {
-            m_aspectTransform->setHReverse(false);
+            if (self.cameraState == VCCameraStateFront) {
+                m_aspectTransform->setHReverse(true);
+            }
+            else {
+                m_aspectTransform->setHReverse(false);
             }
         }
     }
@@ -498,6 +498,7 @@ namespace videocore { namespace simpleApi {
 
     _cameraState = cameraState;
     self.customCamera = cameraState == VCCameraStateCustom;
+    
     _exposurePOI = _focusPOI = CGPointMake(0.5f, 0.5f);
     _continuousExposure = _continuousAutofocus = YES;
 
@@ -756,7 +757,7 @@ namespace videocore { namespace simpleApi {
         m_pbOutput = std::make_shared<videocore::simpleApi::PixelBufferOutput>([=](const void* const data, size_t size){
             CVPixelBufferRef ref = (CVPixelBufferRef)data;
             if (!self.customPreview) {
-            [preview drawFrame:ref];//TODO 加个属性识别是用户自行处理preview，可以避免drawFrame
+                [preview drawFrame:ref];//TODO 加个属性识别是用户自行处理preview，可以避免drawFrame
             }
             if(self.rtmpSessionState == VCSessionStateNone) {
                 self.rtmpSessionState = VCSessionStatePreviewStarted;
@@ -924,6 +925,52 @@ namespace videocore { namespace simpleApi {
     m_pixelBufferSource->pushPixelBuffer(rawData, width * height * 4);
     
     free(rawData);
+    
+}
+-(void)addPixelBufferSource:(CVPixelBufferRef)bufferRef
+              realImageSize:(CGSize)size
+                    andRect:(CGRect)rect{
+    
+    NSInteger width = size.width;
+    NSInteger height = size.height;
+    
+    CVPixelBufferLockBaseAddress(bufferRef, 0);
+    GLubyte *rawImageBytes = (GLubyte *)CVPixelBufferGetBaseAddress(bufferRef); //CASTED I DONT kNOW WHY
+    size_t dataSize = CVPixelBufferGetDataSize(bufferRef);
+    size_t bufferHeight = CVPixelBufferGetHeight(bufferRef);
+    size_t bufferWidth = CVPixelBufferGetWidth(bufferRef);
+    
+    unsigned char* buffer = (unsigned char*)malloc( dataSize );
+    for (int y=0; y<bufferHeight; y++) {
+        for (int x=0; x<bufferWidth; x++) {
+            buffer[y * bufferWidth * 4 + 4 * x + 0] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 0];
+            buffer[y * bufferWidth * 4 + 4 * x + 1] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 1];
+            buffer[y * bufferWidth * 4 + 4 * x + 2] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 2];
+            buffer[y * bufferWidth * 4 + 4 * x + 3] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 3];
+        }
+    }
+    
+    CVPixelBufferUnlockBaseAddress(bufferRef, 0);
+    
+    if(m_pixelBufferSource){
+        m_pixelBufferSource->pushPixelBuffer(buffer, width * height * 4);
+    }else{
+        m_pixelBufferSource = std::make_shared<videocore::Apple::PixelBufferSource>(width, height, kCVPixelFormatType_32BGRA);
+        
+        m_pbAspect = std::make_shared<videocore::AspectTransform>(self.videoSize.width,self.videoSize.height,m_aspectMode);
+        
+        m_pbPosition = std::make_shared<videocore::PositionTransform>(self.videoSize.width/2, self.videoSize.height/2,
+                                                                      self.videoSize.width * self.videoZoomFactor, self.videoSize.height * self.videoZoomFactor,
+                                                                      self.videoSize.width, self.videoSize.height
+                                                                      );
+        NSLog(@"rect:%@\nvideoSize:%@",[NSValue valueWithCGRect:rect],[NSValue valueWithCGSize:self.videoSize]);
+        m_pixelBufferSource->setOutput(m_pbAspect);
+        m_pbAspect->setOutput(m_pbPosition);
+        m_pbPosition->setOutput(m_videoMixer);
+        m_videoMixer->registerSource(m_pixelBufferSource);
+        m_pixelBufferSource->pushPixelBuffer(buffer, width * height * 4);
+    }
+    free(buffer);
     
 }
 - (void) bufferCaptured:(CVPixelBufferRef)pixelBufferRef{
