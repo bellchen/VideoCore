@@ -937,19 +937,8 @@ namespace videocore { namespace simpleApi {
     CVPixelBufferLockBaseAddress(bufferRef, 0);
     GLubyte *rawImageBytes = (GLubyte *)CVPixelBufferGetBaseAddress(bufferRef); //CASTED I DONT kNOW WHY
     size_t dataSize = CVPixelBufferGetDataSize(bufferRef);
-    size_t bufferHeight = CVPixelBufferGetHeight(bufferRef);
-    size_t bufferWidth = CVPixelBufferGetWidth(bufferRef);
-    
     unsigned char* buffer = (unsigned char*)malloc( dataSize );
-    for (int y=0; y<bufferHeight; y++) {
-        for (int x=0; x<bufferWidth; x++) {
-            buffer[y * bufferWidth * 4 + 4 * x + 0] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 0];
-            buffer[y * bufferWidth * 4 + 4 * x + 1] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 1];
-            buffer[y * bufferWidth * 4 + 4 * x + 2] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 2];
-            buffer[y * bufferWidth * 4 + 4 * x + 3] = rawImageBytes[y * bufferWidth * 4 + 4 * x + 3];
-        }
-    }
-    
+    memcpy(buffer, rawImageBytes, dataSize);
     CVPixelBufferUnlockBaseAddress(bufferRef, 0);
     
     if(m_pixelBufferSource){
