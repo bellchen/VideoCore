@@ -757,7 +757,7 @@ namespace videocore { namespace simpleApi {
         m_pbOutput = std::make_shared<videocore::simpleApi::PixelBufferOutput>([=](const void* const data, size_t size){
             CVPixelBufferRef ref = (CVPixelBufferRef)data;
             if (!self.customPreview) {
-                [preview drawFrame:ref];//TODO 加个属性识别是用户自行处理preview，可以避免drawFrame
+                [preview drawFrame:ref];
             }
             if(self.rtmpSessionState == VCSessionStateNone) {
                 self.rtmpSessionState = VCSessionStatePreviewStarted;
