@@ -135,7 +135,9 @@ namespace videocore { namespace iOS {
                     AVCaptureDeviceInput* input;
                     AVCaptureVideoDataOutput* output;
                     if(sessionPreset) {
-                        session.sessionPreset = (NSString*)sessionPreset;
+                        if ([session canSetSessionPreset:sessionPreset]) {
+                            session.sessionPreset = (NSString*)sessionPreset;
+                        }
                     }
                     bThis->m_captureSession = session;
                     
