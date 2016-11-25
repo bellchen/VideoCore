@@ -148,6 +148,7 @@ namespace videocore { namespace simpleApi {
     VCFilter _filter;
 }
 @property (nonatomic, readwrite) VCSessionState rtmpSessionState;
+@property (nonatomic, readwrite) NSString *sessionPreset;
 
 - (void) setupGraph;
 
@@ -472,7 +473,41 @@ namespace videocore { namespace simpleApi {
     return self;
 }
 
+- (instancetype) initWithVideoSize:(CGSize)videoSize
+                         frameRate:(int)fps
+                           bitrate:(int)bps
+           useInterfaceOrientation:(BOOL)useInterfaceOrientation
+                       cameraState:(VCCameraState) cameraState
+                        aspectMode:(VCAspectMode)aspectMode
+                     sessionPreset:(NSString*)sessionPreset
+{
+    if (( self = [super init] ))
+    {
+        [self initInternalWithVideoSize:videoSize
+                              frameRate:fps
+                                bitrate:bps
+                useInterfaceOrientation:useInterfaceOrientation
+                            cameraState:cameraState
+                             aspectMode:aspectMode
+                          sessionPreset:sessionPreset];
+    }
+    return self;
+}
 
+- (void) initInternalWithVideoSize:(CGSize)videoSize
+                         frameRate:(int)fps
+                           bitrate:(int)bps
+           useInterfaceOrientation:(BOOL)useInterfaceOrientation
+                       cameraState:(VCCameraState) cameraState
+                        aspectMode:(VCAspectMode)aspectMode{
+    [self initInternalWithVideoSize:videoSize
+                          frameRate:fps
+                            bitrate:bps
+            useInterfaceOrientation:useInterfaceOrientation
+                        cameraState:cameraState
+                         aspectMode:aspectMode
+                      sessionPreset:AVCaptureSessionPreset1280x720];
+}
 
 - (void) initInternalWithVideoSize:(CGSize)videoSize
                          frameRate:(int)fps
@@ -480,6 +515,7 @@ namespace videocore { namespace simpleApi {
            useInterfaceOrientation:(BOOL)useInterfaceOrientation
                        cameraState:(VCCameraState) cameraState
                         aspectMode:(VCAspectMode)aspectMode
+                     sessionPreset:(NSString*)sessionPreset
 {
     self.bitrate = bps;
     self.videoSize = videoSize;
@@ -503,7 +539,8 @@ namespace videocore { namespace simpleApi {
     _continuousExposure = _continuousAutofocus = YES;
 
     _graphManagementQueue = dispatch_queue_create("com.videocore.session.graph", 0);
-
+    
+    self.sessionPreset = sessionPreset;
     __block VCSimpleSession* bSelf = self;
 
     dispatch_async(_graphManagementQueue, ^{
@@ -815,7 +852,7 @@ namespace videocore { namespace simpleApi {
         if (self.cameraState == VCCameraStateCustom) {
             setupCameraCallback();
         }else{
-            std::dynamic_pointer_cast<videocore::iOS::CameraSource>(m_cameraSource)->setupCamera(self.fps,(self.cameraState == VCCameraStateFront),self.useInterfaceOrientation,AVCaptureSessionPreset1280x720,setupCameraCallback);
+            std::dynamic_pointer_cast<videocore::iOS::CameraSource>(m_cameraSource)->setupCamera(self.fps,(self.cameraState == VCCameraStateFront),self.useInterfaceOrientation,self.sessionPreset,setupCameraCallback);
         }
     }
     {

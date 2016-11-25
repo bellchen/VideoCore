@@ -147,7 +147,13 @@ typedef NS_ENUM(NSInteger, VCDisconnectReason) {
                         aspectMode:(VCAspectMode) aspectMode;
 
 // -----------------------------------------------------------------------------
-
+- (instancetype) initWithVideoSize:(CGSize)videoSize
+                         frameRate:(int)fps
+                           bitrate:(int)bps
+           useInterfaceOrientation:(BOOL)useInterfaceOrientation
+                       cameraState:(VCCameraState) cameraState
+                        aspectMode:(VCAspectMode)aspectMode
+                     sessionPreset:(NSString*)sessionPreset;
 - (void) startRtmpSessionWithURL:(NSString*) rtmpUrl
                     andStreamKey:(NSString*) streamKey;
 
