@@ -137,6 +137,8 @@ namespace videocore { namespace iOS {
                     if(sessionPreset) {
                         if ([session canSetSessionPreset:sessionPreset]) {
                             session.sessionPreset = (NSString*)sessionPreset;
+                        }else{
+                            session.sessionPreset = AVCaptureSessionPresetLow;
                         }
                     }
                     bThis->m_captureSession = session;
